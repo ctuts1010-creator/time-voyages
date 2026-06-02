@@ -39,11 +39,16 @@ export async function POST(request: Request) {
     });
 
     return Response.json({ success: true });
-  } catch (error) {
+    } catch (error) {
     console.error("RESEND_ERROR:", error);
 
     return Response.json(
-      { error: "Không gửi được email" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : JSON.stringify(error),
+      },
       { status: 500 }
     );
   }

@@ -37,8 +37,9 @@ export default function ContactPage() {
       setStatus("Gửi thành công! Time Voyages sẽ liên hệ bạn sớm.");
       form.reset();
     } else {
-      setStatus("Gửi thất bại. Vui lòng thử lại.");
-    }
+  const errorData = await response.json();
+  setStatus(`Gửi thất bại: ${errorData.error}`);
+}
   }
 
   return (
