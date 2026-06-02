@@ -1,4 +1,46 @@
+"use client";
+
+import { useState } from "react";
+
 export default function ContactPage() {
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+
+    setLoading(true);
+    setStatus("");
+
+    const formData = new FormData(event.currentTarget);
+
+    const data = {
+      name: formData.get("name"),
+      phone: formData.get("phone"),
+      email: formData.get("email"),
+      tour: formData.get("tour"),
+      message: formData.get("message"),
+    };
+
+    const response = await fetch("/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    setLoading(false);
+
+    if (response.ok) {
+      setStatus("Gửi thành công! Time Voyages sẽ liên hệ bạn sớm.");
+      form.reset();
+    } else {
+      setStatus("Gửi thất bại. Vui lòng thử lại.");
+    }
+  }
+
   return (
     <main className="bg-slate-50 px-6 py-20">
       <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1fr_1.3fr]">
@@ -38,10 +80,12 @@ export default function ContactPage() {
             Gửi yêu cầu tư vấn
           </h2>
 
-          <form className="mt-8 space-y-5">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div>
               <label className="mb-2 block font-semibold">Họ và tên</label>
               <input
+                name="name"
+                required
                 className="w-full rounded-xl border border-slate-300 p-4 outline-none focus:border-sky-500"
                 placeholder="Nguyễn Văn A"
               />
@@ -50,6 +94,8 @@ export default function ContactPage() {
             <div>
               <label className="mb-2 block font-semibold">Số điện thoại</label>
               <input
+                name="phone"
+                required
                 className="w-full rounded-xl border border-slate-300 p-4 outline-none focus:border-sky-500"
                 placeholder="0900 000 000"
               />
@@ -58,6 +104,9 @@ export default function ContactPage() {
             <div>
               <label className="mb-2 block font-semibold">Email</label>
               <input
+                name="email"
+                type="email"
+                required
                 className="w-full rounded-xl border border-slate-300 p-4 outline-none focus:border-sky-500"
                 placeholder="email@example.com"
               />
@@ -65,7 +114,10 @@ export default function ContactPage() {
 
             <div>
               <label className="mb-2 block font-semibold">Tour quan tâm</label>
-              <select className="w-full rounded-xl border border-slate-300 p-4 outline-none focus:border-sky-500">
+              <select
+                name="tour"
+                className="w-full rounded-xl border border-slate-300 p-4 outline-none focus:border-sky-500"
+              >
                 <option>Đà Nẵng - Hội An</option>
                 <option>Phú Quốc</option>
                 <option>Hạ Long</option>
@@ -76,17 +128,26 @@ export default function ContactPage() {
             <div>
               <label className="mb-2 block font-semibold">Nội dung</label>
               <textarea
+                name="message"
+                required
                 className="h-36 w-full rounded-xl border border-slate-300 p-4 outline-none focus:border-sky-500"
                 placeholder="Bạn muốn đi khi nào? Bao nhiêu người?"
               />
             </div>
 
             <button
-              type="button"
-              className="w-full rounded-xl bg-sky-600 px-6 py-4 font-bold text-white hover:bg-sky-700"
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-sky-600 px-6 py-4 font-bold text-white hover:bg-sky-700 disabled:opacity-60"
             >
-              Gửi yêu cầu
+              {loading ? "Đang gửi..." : "Gửi yêu cầu"}
             </button>
+
+            {status && (
+              <p className="font-semibold text-sky-600">
+                {status}
+              </p>
+            )}
           </form>
         </section>
       </div>
